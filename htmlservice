@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Service</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <h2>🚗 Vehicle Service Management</h2>
+    <a href="/dashboard">Dashboard</a>
+</nav>
+
+<div class="container">
+
+    <h1>Book Vehicle Service</h1>
+
+    <form method="POST">
+
+        <label>Select Vehicle</label>
+
+        <select name="vehicle_id" required>
+
+            <option value="">
+                Select Vehicle
+            </option>
+
+            {% for vehicle in vehicles %}
+
+            <option value="{{ vehicle.id }}">
+                {{ vehicle.vehicle_number }}
+                - {{ vehicle.vehicle_model }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label>Service Type</label>
+
+        <select name="service_type" required>
+
+            <option value="">
+                Select Service
+            </option>
+
+            <option value="General Service">
+                General Service
+            </option>
+
+            <option value="Oil Change">
+                Oil Change
+            </option>
+
+            <option value="Brake Service">
+                Brake Service
+            </option>
+
+            <option value="Engine Repair">
+                Engine Repair
+            </option>
+
+            <option value="AC Service">
+                AC Service
+            </option>
+
+            <option value="Wheel Alignment">
+                Wheel Alignment
+            </option>
+
+        </select>
+
+        <label>Service Date</label>
+
+        <input
+            type="date"
+            name="service_date"
+            required
+        >
+
+        <label>Description</label>
+
+        <textarea
+            name="description"
+            placeholder="Enter service requirements"
+        ></textarea>
+
+        <button type="submit">
+            Book Service
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

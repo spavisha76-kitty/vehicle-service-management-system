@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle Service Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <h2>🚗 Vehicle Service Management</h2>
+
+    <div>
+        <a href="/">Home</a>
+        <a href="/register">Register Customer</a>
+        <a href="/dashboard">Dashboard</a>
+    </div>
+</nav>
+
+<section class="hero">
+
+    <h1>Vehicle Service Management System</h1>
+
+    <p>
+        Manage customers, vehicles and service bookings
+        easily from one system.
+    </p>
+
+    <a class="button" href="/register">
+        Register Customer
+    </a>
+
+    <a class="button" href="/dashboard">
+        View Dashboard
+    </a>
+
+</section>
+
+<section class="features">
+
+    <div>
+        <h3>👤 Customer Management</h3>
+        <p>Register and manage customer information.</p>
+    </div>
+
+    <div>
+        <h3>🚘 Vehicle Management</h3>
+        <p>Store vehicle details and customer information.</p>
+    </div>
+
+    <div>
+        <h3>🔧 Service Booking</h3>
+        <p>Book and track vehicle service requests.</p>
+    </div>
+
+    <div>
+        <h3>📊 Service Tracking</h3>
+        <p>Monitor the current status of every service.</p>
+    </div>
+
+</section>
+
+</body>
+</html>

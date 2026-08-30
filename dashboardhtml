@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+
+    <h2>🚗 Vehicle Service Management</h2>
+
+    <div>
+
+        <a href="/">Home</a>
+
+        <a href="/register">
+            Register Customer
+        </a>
+
+        <a href="/add_vehicle">
+            Add Vehicle
+        </a>
+
+        <a href="/book_service">
+            Book Service
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- CUSTOMER SECTION -->
+
+    <h2>Customers</h2>
+
+    <table>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+        </tr>
+
+        {% for customer in customers %}
+
+        <tr>
+
+            <td>{{ customer.id }}</td>
+
+            <td>{{ customer.name }}</td>
+
+            <td>{{ customer.email }}</td>
+
+            <td>{{ customer.phone }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <!-- VEHICLE SECTION -->
+
+    <h2>Vehicles</h2>
+
+    <table>
+
+        <tr>
+
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Vehicle Number</th>
+            <th>Model</th>
+            <th>Type</th>
+
+        </tr>
+
+        {% for vehicle in vehicles %}
+
+        <tr>
+
+            <td>{{ vehicle.id }}</td>
+
+            <td>{{ vehicle.name }}</td>
+
+            <td>{{ vehicle.vehicle_number }}</td>
+
+            <td>{{ vehicle.vehicle_model }}</td>
+
+            <td>{{ vehicle.vehicle_type }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <!-- SERVICE SECTION -->
+
+    <h2>Service Bookings</h2>
+
+    <table>
+
+        <tr>
+
+            <th>ID</th>
+            <th>Vehicle</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Actions</th>
+
+        </tr>
+
+        {% for service in services %}
+
+        <tr>
+
+            <td>{{ service.id }}</td>
+
+            <td>{{ service.vehicle_number }}</td>
+
+            <td>{{ service.service_type }}</td>
+
+            <td>{{ service.service_date }}</td>
+
+            <td>{{ service.description }}</td>
+
+            <td>
+                <strong>
+                    {{ service.status }}
+                </strong>
+            </td>
+
+            <td>
+
+                <a class="small-button"
+                   href="/update_status/{{ service.id }}/In Progress">
+                    Start
+                </a>
+
+                <a class="small-button"
+                   href="/update_status/{{ service.id }}/Completed">
+                    Complete
+                </a>
+
+                <a class="delete"
+                   href="/delete_service/{{ service.id }}">
+                    Delete
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+</html>

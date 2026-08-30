@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Vehicle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <h2>🚗 Vehicle Service Management</h2>
+    <a href="/dashboard">Dashboard</a>
+</nav>
+
+<div class="container">
+
+    <h1>Add Vehicle</h1>
+
+    <form method="POST">
+
+        <label>Customer</label>
+
+        <select name="customer_id" required>
+
+            <option value="">
+                Select Customer
+            </option>
+
+            {% for customer in customers %}
+
+            <option value="{{ customer.id }}">
+                {{ customer.name }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label>Vehicle Number</label>
+        <input
+            type="text"
+            name="vehicle_number"
+            placeholder="TN01AB1234"
+            required
+        >
+
+        <label>Vehicle Model</label>
+        <input
+            type="text"
+            name="vehicle_model"
+            placeholder="Honda City"
+            required
+        >
+
+        <label>Vehicle Type</label>
+
+        <select name="vehicle_type" required>
+
+            <option value="">Select Type</option>
+            <option value="Car">Car</option>
+            <option value="Bike">Bike</option>
+            <option value="Scooter">Scooter</option>
+            <option value="Other">Other</option>
+
+        </select>
+
+        <button type="submit">
+            Add Vehicle
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

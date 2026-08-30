@@ -1,0 +1,256 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+import sqlite3
+
+app = Flask(__name__)
+app.secret_key = "vehicle_service_secret"
+
+
+# ---------------- DATABASE ----------------
+
+def get_db():
+    conn = sqlite3.connect("vehicle_service.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    conn = get_db()
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT NOT NULL
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS vehicles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id INTEGER NOT NULL,
+            vehicle_number TEXT NOT NULL,
+            vehicle_model TEXT NOT NULL,
+            vehicle_type TEXT NOT NULL,
+            FOREIGN KEY(customer_id) REFERENCES customers(id)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS services (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vehicle_id INTEGER NOT NULL,
+            service_type TEXT NOT NULL,
+            service_date TEXT NOT NULL,
+            description TEXT,
+            status TEXT DEFAULT 'Pending',
+            FOREIGN KEY(vehicle_id) REFERENCES vehicles(id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+# ---------------- HOME ----------------
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+# ---------------- REGISTER CUSTOMER ----------------
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        name = request.form["name"]
+        email = request.form["email"]
+        phone = request.form["phone"]
+
+        conn = get_db()
+
+        conn.execute(
+            "INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)",
+            (name, email, phone)
+        )
+
+        conn.commit()
+        conn.close()
+
+        flash("Customer registered successfully!")
+
+        return redirect(url_for("dashboard"))
+
+    return render_template("register.html")
+
+
+# ---------------- DASHBOARD ----------------
+
+@app.route("/dashboard")
+def dashboard():
+
+    conn = get_db()
+
+    customers = conn.execute(
+        "SELECT * FROM customers"
+    ).fetchall()
+
+    vehicles = conn.execute("""
+        SELECT vehicles.*, customers.name
+        FROM vehicles
+        JOIN customers ON vehicles.customer_id = customers.id
+    """).fetchall()
+
+    services = conn.execute("""
+        SELECT services.*, vehicles.vehicle_number
+        FROM services
+        JOIN vehicles ON services.vehicle_id = vehicles.id
+        ORDER BY services.id DESC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "dashboard.html",
+        customers=customers,
+        vehicles=vehicles,
+        services=services
+    )
+
+
+# ---------------- ADD VEHICLE ----------------
+
+@app.route("/add_vehicle", methods=["GET", "POST"])
+def add_vehicle():
+
+    conn = get_db()
+
+    customers = conn.execute(
+        "SELECT * FROM customers"
+    ).fetchall()
+
+    if request.method == "POST":
+
+        customer_id = request.form["customer_id"]
+        vehicle_number = request.form["vehicle_number"]
+        vehicle_model = request.form["vehicle_model"]
+        vehicle_type = request.form["vehicle_type"]
+
+        conn.execute("""
+            INSERT INTO vehicles
+            (customer_id, vehicle_number, vehicle_model, vehicle_type)
+            VALUES (?, ?, ?, ?)
+        """, (
+            customer_id,
+            vehicle_number,
+            vehicle_model,
+            vehicle_type
+        ))
+
+        conn.commit()
+        conn.close()
+
+        flash("Vehicle added successfully!")
+
+        return redirect(url_for("dashboard"))
+
+    conn.close()
+
+    return render_template(
+        "add_vehicle.html",
+        customers=customers
+    )
+
+
+# ---------------- BOOK SERVICE ----------------
+
+@app.route("/book_service", methods=["GET", "POST"])
+def book_service():
+
+    conn = get_db()
+
+    vehicles = conn.execute(
+        "SELECT * FROM vehicles"
+    ).fetchall()
+
+    if request.method == "POST":
+
+        vehicle_id = request.form["vehicle_id"]
+        service_type = request.form["service_type"]
+        service_date = request.form["service_date"]
+        description = request.form["description"]
+
+        conn.execute("""
+            INSERT INTO services
+            (vehicle_id, service_type, service_date, description)
+            VALUES (?, ?, ?, ?)
+        """, (
+            vehicle_id,
+            service_type,
+            service_date,
+            description
+        ))
+
+        conn.commit()
+        conn.close()
+
+        flash("Service booked successfully!")
+
+        return redirect(url_for("dashboard"))
+
+    conn.close()
+
+    return render_template(
+        "book_service.html",
+        vehicles=vehicles
+    )
+
+
+# ---------------- UPDATE SERVICE STATUS ----------------
+
+@app.route("/update_status/<int:service_id>/<status>")
+def update_status(service_id, status):
+
+    conn = get_db()
+
+    conn.execute(
+        "UPDATE services SET status = ? WHERE id = ?",
+        (status, service_id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Service status updated!")
+
+    return redirect(url_for("dashboard"))
+
+
+# ---------------- DELETE SERVICE ----------------
+
+@app.route("/delete_service/<int:service_id>")
+def delete_service(service_id):
+
+    conn = get_db()
+
+    conn.execute(
+        "DELETE FROM services WHERE id = ?",
+        (service_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Service deleted successfully!")
+
+    return redirect(url_for("dashboard"))
+
+
+# ---------------- RUN APPLICATION ----------------
+
+if __name__ == "__main__":
+    init_db()
+    app.run(debug=True)
